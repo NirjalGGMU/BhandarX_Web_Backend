@@ -1,34 +1,25 @@
-// import express from "express";
-// import { config } from "./config";
-// import { connectDB } from "./database/mongodb";
-// import authRoutes from "./routes/auth.route";
-
-// const app = express();
-
-// app.use(express.json());
-
-// app.use("/api/auth", authRoutes);
-
-// connectDB();
-
-// app.listen(config.port, () => {
-//   console.log(`🚀 Server running on port ${config.port}`);
-// });
-
-
 import express from "express";
-import { config } from "./config";
+import cors from "cors";
 import { connectDB } from "./database/mongodb";
 import authRoutes from "./routes/auth.route";
+import { PORT } from "./config";
 
 const app = express();
 
+app.use(cors({ origin: "http://localhost:3000", credentials: true }));
 app.use(express.json());
+
+app.get("/", (req, res) => {
+  res.json({ message: "BhandarX API is running!" });
+});
 
 app.use("/api/auth", authRoutes);
 
-connectDB();
+const start = async () => {
+  await connectDB();
+  app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+  });
+};
 
-app.listen(config.port, () => {
-  console.log(`🚀 Server running on port ${config.port}`);
-});
+start();
