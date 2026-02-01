@@ -2,11 +2,11 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-export const config = {
-  port: process.env.PORT || 5050,
-  mongoUri: process.env.MONGODB_URI as string,
-  jwtSecret: process.env.JWT_SECRET as string,
-};
+export const JWT_SECRET = process.env.JWT_SECRET || "bhandarx_secret";  // JWT secret from .env
+export const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017/bhandarx";  // MongoDB URI from .env
+export const PORT = process.env.PORT || 5050;  // Port from .env
+
+
 
 
 
