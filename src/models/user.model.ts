@@ -11,17 +11,32 @@
 // );
 
 // export const UserModel = mongoose.model("User", userSchema);
+import mongoose, { Document, Schema } from "mongoose";
+import { UserType } from "../types/user.type";
 
-
-import mongoose from "mongoose";
-const userSchema = new mongoose.Schema(
-  {
-    name: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
-    role: { type: String, enum: ["user", "admin"], default: "user" },
-    image: { type: String, default: "" },  // Added
-  },
-  { timestamps: true }
+const UserSchema: Schema = new Schema<UserType>(
+    {
+        email: { type: String, required: true, unique: true },
+        password: { type: String, required: true },
+        username: { type: String, required: true, unique: true },
+        firstName: { type: String },
+        lastName: { type: String },
+        role: {
+            type: String,
+            enum: ['user', 'admin'],
+            default: 'user',
+        },
+        imageUrl: { type: String, required: false },
+    },
+    {
+        timestamps: true,
+    }
 );
-export const UserModel = mongoose.model("User", userSchema);
+
+export interface IUser extends UserType, Document {
+    _id: mongoose.Types.ObjectId;
+    createdAt: Date;
+    updatedAt: Date;
+}
+
+export const UserModel = mongoose.model<IUser>('User', UserSchema);
