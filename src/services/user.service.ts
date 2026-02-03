@@ -1,110 +1,90 @@
+// src/services.user.service.ts
+
+import { CreateUserDTO, LoginUserDTO, UpdateUserDTO } from "../dtos/user.dto";
+import { UserRepository } from "../repositories/user.repository";
 import bcryptjs from "bcryptjs";
-import jwt from "jsonwebtoken";
-import { getUserByEmail, createUser } from "../repositories/user.repository";
 import { HttpError } from "../errors/http-error";
-import { JWT_SECRET } from "../config"; // Ensure secret is imported
+import jwt from "jsonwebtoken";
+import { JWT_SECRET } from "../config";
 
-export const registerUser = async (data: any) => {
-  const existingUser = await getUserByEmail(data.email);
-  if (existingUser) {
-    throw new HttpError(400, "Email already exists");
-  }
+let userRepository = new UserRepository();
 
-  const hashedPassword = await bcryptjs.hash(data.password, 10);
+export class UserService {
+    async createUser(data: CreateUserDTO) {
+        const emailCheck = await userRepository.getUserByEmail(data.email);
+        if (emailCheck) {
+            throw new HttpError(403, "Email already in use");
+        }
+        const usernameCheck = await userRepository.getUserByUsername(data.username);
+        if (usernameCheck) {
+            throw new HttpError(403, "Username already in use");
+        }
 
-  const newUser = await createUser({
-    name: data.name,
-    email: data.email,
-    password: hashedPassword,
-    role: "user",
-  });
+        const hashedPassword = await bcryptjs.hash(data.password, 10);
+        data.password = hashedPassword;
 
-  return {
-    message: "User created successfully",
-    user: {
-      id: newUser._id,
-      name: newUser.name,
-      email: newUser.email,
-      role: newUser.role,
-    },
-  };
-};
+        const newUser = await userRepository.createUser(data);
+        return newUser;
+    }
 
-export const loginUser = async (data: any) => {
-  const user = await getUserByEmail(data.email);
-  if (!user) {
-    throw new HttpError(401, "Invalid email or password");
-  }
+    async loginUser(data: LoginUserDTO) {
+        const user = await userRepository.getUserByEmail(data.email);
+        if (!user) {
+            throw new HttpError(404, "User not found");
+        }
 
-  const isValid = await bcryptjs.compare(data.password, user.password);
-  if (!isValid) {
-    throw new HttpError(401, "Invalid email or password");
-  }
+        const validPassword = await bcryptjs.compare(data.password, user.password);
+        if (!validPassword) {
+            throw new HttpError(401, "Invalid credentials");
+        }
 
-  const token = jwt.sign(
-    { id: user._id, email: user.email, role: user.role },
-    JWT_SECRET,
-    { expiresIn: "7d" } // Set expiration
-  );
+        const payload = {
+            id: user._id,
+            email: user.email,
+            username: user.username,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            role: user.role
+        };
 
-  return {
-    success: true,
-    message: "Login successful",
-    token,
-    user: {
-      id: user._id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-    },
-  };
-};
+        const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '30d' });
+        return { token, user };
+    }
 
-// import bcrypt from "bcryptjs";
-// import jwt from "jsonwebtoken";
-// import { config } from "../config";
-// import { createUser, findUserByEmail } from "../repositories/user.repository";
-// import { HttpError } from "../errors/http-error";
-// import { LoginUserInput, RegisterUserInput } from "../types/user.type";
+    async getUserById(userId: string) {
+        const user = await userRepository.getUserById(userId);
+        if (!user) {
+            throw new HttpError(404, "User not found");
+        }
+        return user;
+    }
 
-// export const registerUserService = async (input: RegisterUserInput) => {
-//   const existingUser = await findUserByEmail(input.email);
+    async updateUser(userId: string, data: UpdateUserDTO) {
+        const user = await userRepository.getUserById(userId);
+        if (!user) {
+            throw new HttpError(404, "User not found");
+        }
 
-//   if (existingUser) throw new HttpError("Email already exists", 409);
+        if (data.email && user.email !== data.email) {
+            const emailExists = await userRepository.getUserByEmail(data.email);
+            if (emailExists) {
+                throw new HttpError(403, "Email already in use");
+            }
+        }
 
-//   const hashedPassword = await bcrypt.hash(input.password, 10);
+        if (data.username && user.username !== data.username) {
+            const usernameExists = await userRepository.getUserByUsername(data.username);
+            if (usernameExists) {
+                throw new HttpError(403, "Username already in use");
+            }
+        }
 
-//   const user = await createUser({
-//     name: input.name,
-//     email: input.email,
-//     password: hashedPassword,
-//     role: input.role, // now uses input.role
-//   });
+        if (data.password) {
+            const hashedPassword = await bcryptjs.hash(data.password, 10);
+            data.password = hashedPassword;
+        }
 
-//   return {
-//     id: user._id,
-//     email: user.email,
-//     role: user.role,
-//     name: user.name,
-//   };
-// };
-
-// export const loginUserService = async (input: LoginUserInput) => {
-//   const user = await findUserByEmail(input.email);
-//   if (!user) throw new HttpError("Invalid email or password", 401);
-
-//   const isPasswordValid = await bcrypt.compare(input.password, user.password);
-//   if (!isPasswordValid) throw new HttpError("Invalid email or password", 401);
-
-//   const token = jwt.sign({ userId: user._id, role: user.role }, config.jwtSecret, { expiresIn: "1d" });
-
-//   return {
-//     token,
-//     user: {
-//       id: user._id,
-//       name: user.name,
-//       email: user.email,
-//       role: user.role,
-//     },
-//   };
-// };
+        const updatedUser = await userRepository.updateUser(userId, data);
+        return updatedUser;
+    }
+}
