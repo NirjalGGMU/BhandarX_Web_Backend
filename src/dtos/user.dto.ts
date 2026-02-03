@@ -1,21 +1,31 @@
-// DTOs for User operations
-import { z } from "zod";
-import { RegisterSchema, LoginSchema } from "../types/user.type";
+import z from "zod";
+import { UserSchema } from "../types/user.type";
 
-// Reuse RegisterSchema from types, but add confirmPassword validation
-export const CreateUserDTO = RegisterSchema.pick({
-  name: true,
-  email: true,
-  password: true,
+export const CreateUserDTO = UserSchema.pick({
+    firstName: true,
+    lastName: true,
+    email: true,
+    username: true,
+    password: true,
+    imageUrl: true,
 }).extend({
-  confirmPassword: z.string().min(6, "Confirm password must be at least 6 characters"),
+    confirmPassword: z.string().min(6)
 }).refine(
-  (data) => data.password === data.confirmPassword,
-  { message: "Passwords do not match", path: ["confirmPassword"] },
+    (data) => data.password === data.confirmPassword,
+    {
+        message: "Passwords do not match",
+        path: ["confirmPassword"]
+    }
 );
 
 export type CreateUserDTO = z.infer<typeof CreateUserDTO>;
 
-// Simple login DTO (reuses parts of LoginSchema)
-export const LoginUserDTO = LoginSchema;
+export const LoginUserDTO = z.object({
+    email: z.string().email(),
+    password: z.string().min(6)
+});
+
 export type LoginUserDTO = z.infer<typeof LoginUserDTO>;
+
+export const UpdateUserDTO = UserSchema.partial();
+export type UpdateUserDTO = z.infer<typeof UpdateUserDTO>;
