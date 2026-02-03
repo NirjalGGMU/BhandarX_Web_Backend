@@ -1,12 +1,20 @@
 import { Router } from "express";
-import { register, login, updateProfile } from "../controllers/auth.controller";
-import { authMiddleware } from "../middlewares/auth";
-import { upload } from "../config/multer";
+import { AuthController } from "../controllers/auth.controller";
+import { authorizedMiddleware } from "../middlewares/authorized.middleware";
+import { uploads } from "../middlewares/upload.middleware";
 
+let authController = new AuthController();
 const router = Router();
-router.post("/register", register);
-router.post("/login", login);
-router.put("/:id", authMiddleware, upload.single("image"), updateProfile);  // Added
+
+router.post("/register", authController.register);
+router.post("/login", authController.login);
+router.get("/whoami", authorizedMiddleware, authController.getProfile);
+router.put(
+    "/update-profile",
+    authorizedMiddleware,
+    uploads.single("image"),
+    authController.updateProfile
+);
 
 export default router;
 
