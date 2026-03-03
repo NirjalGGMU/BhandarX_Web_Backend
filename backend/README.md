@@ -1,157 +1,226 @@
-# BhandarX Inventory Management System - Backend
+# BhandarX Backend
 
-A production-ready backend API for inventory management built with Node.js, Express, and MongoDB following Clean Architecture principles.
+BhandarX Backend is the server-side API for the BhandarX Inventory Management System. It handles authentication, product and stock management, supplier and customer records, sales and purchase workflows, reporting, notifications, and system activity tracking.
 
-## Architecture
+This backend is designed for an inventory-based business where users need a central API to manage products, monitor stock movement, record transactions, and support role-based access across the system.
 
-This project follows Clean Architecture with clear separation of concerns:
+## What This Project Is Used For
 
+This backend is built to support:
+
+- user authentication and authorization
+- inventory and stock tracking
+- product, category, supplier, and customer management
+- sales, purchases, and transaction history
+- reports and dashboard analytics
+- notifications and activity logging
+- API-based integration with the frontend dashboard
+
+## Main Backend Features
+
+- JWT-based authentication
+- role-based access control
+- product and product variant management
+- category management
+- supplier and customer management
+- purchase order management
+- sales and invoice flow
+- stock ledger and transaction history
+- dashboard and reporting endpoints
+- activity logs and audit trail
+- real-time updates with Socket.IO
+- email and notification support
+- Swagger API documentation
+
+## Technologies Used
+
+### Core
+
+- Node.js
+- Express.js
+- MongoDB
+- Mongoose
+
+### Security and Validation
+
+- `jsonwebtoken` for auth tokens
+- `bcryptjs` for password hashing
+- `helmet` for security headers
+- `cors` for cross-origin access control
+- `express-validator` for request validation
+- `express-rate-limit` for API throttling
+- `express-mongo-sanitize` for input hardening
+
+### File and Media Handling
+
+- `multer` for file uploads
+- `cloudinary` and `multer-storage-cloudinary` for media storage
+
+### Documentation, Logging, and Realtime
+
+- `swagger-jsdoc` and `swagger-ui-express` for API docs
+- `winston` and `morgan` for logging
+- `socket.io` for real-time updates
+- `nodemailer` for email delivery
+
+### Development Tools
+
+- `nodemon`
+- `eslint`
+- `jest`
+- `supertest`
+
+## Project Structure
+
+```text
+backend/
+├── scripts/                 # Utility scripts such as database seeding
+├── src/
+│   ├── app/                 # App setup and middleware registration
+│   ├── config/              # Environment, DB, logger, swagger, uploads
+│   ├── modules/             # Feature modules
+│   │   ├── activityLogs/
+│   │   ├── auth/
+│   │   ├── categories/
+│   │   ├── customers/
+│   │   ├── notifications/
+│   │   ├── products/
+│   │   ├── purchases/
+│   │   ├── reports/
+│   │   ├── sales/
+│   │   ├── suppliers/
+│   │   ├── transactions/
+│   │   └── users/
+│   ├── routes/              # Root route registration
+│   ├── shared/              # Shared middleware, utils, services, constants
+│   └── server.js            # Entry point
+├── .env.example             # Example environment variables
+├── package.json
+└── README.md
 ```
-src/
-├── config/          # Configuration files
-├── modules/         # Feature modules (Clean Architecture)
-│   ├── auth/
-│   ├── users/       # User Management
-│   ├── products/
-│   ├── categories/
-│   ├── suppliers/
-│   └── transactions/
-├── shared/          # Shared utilities
-│   ├── middleware/  # Express middleware
-│   ├── utils/       # Utility functions
-│   └── constants/   # Application constants
-├── uploads/         # File uploads
-│   ├── profiles/    # Profile images
-│   ├── products/    # Product images
-│   └── documents/   # Documents
-└── server.js        # Application entry point
+
+## Module Pattern
+
+Most feature modules follow a service-oriented structure:
+
+- `model` for MongoDB schema definition
+- `dto` for input shaping
+- `repository` for database access
+- `service` for business logic
+- `controller` for request handling
+- `routes` for endpoint registration
+
+## API Overview
+
+The backend exposes REST APIs under:
+
+```text
+/api/v1
 ```
 
-### Each Module Structure:
-```
-module/
-├── dtos/           # Data Transfer Objects
-├── models/         # Mongoose Models
-├── repositories/   # Data Access Layer
-├── services/       # Business Logic Layer
-├── controllers/    # Request Handlers
-└── routes.js       # API Routes
-```
+Main API areas include:
 
-## Features
+- `/auth`
+- `/users`
+- `/products`
+- `/categories`
+- `/suppliers`
+- `/customers`
+- `/sales`
+- `/purchases`
+- `/transactions`
+- `/reports`
+- `/notifications`
+- `/activity-logs`
 
-- ✅ User Authentication & Authorization
-- ✅ User Management (CRUD operations)
-- ✅ Profile Image Upload (Multer)
-- ✅ Product/Inventory Management
-- ✅ Product Variants (Size, Color, Attributes)
-- ✅ Stock Alerts (Low Stock, Out of Stock, Expiry)
-- ✅ Stock Ledger & Movement Tracking
-- ✅ Inventory Valuation & Analytics
-- ✅ Category Management
-- ✅ Supplier Management
-- ✅ Customer Management
-- ✅ Sales & Invoicing
-- ✅ Purchase Order Management
-- ✅ Stock Transaction Tracking
-- ✅ Reporting & Analytics
-- ✅ Real-Time Updates (Socket.io)
-- ✅ Notification System (Email, Push, WebSocket)
-- ✅ Activity Logs & Audit Trail
-- ✅ Role-Based Access Control (RBAC)
-- ✅ Input Validation
-- ✅ Error Handling
-- ✅ Security Best Practices
-- ✅ API Rate Limiting
-- ✅ File Upload & Management
-- ✅ Logging
-- ✅ Comprehensive API Documentation (Swagger)
+## Setup
 
-## Installation
+### 1. Install dependencies
 
-1. Install dependencies:
 ```bash
 npm install
 ```
 
-2. Create `.env` file:
+### 2. Create environment file
+
 ```bash
 cp .env.example .env
 ```
 
-3. Update `.env` with your configuration
+Then update the values for MongoDB, JWT secrets, email settings, and port.
 
-4. Start the server:
+### 3. Run the backend
+
+Development:
+
 ```bash
-# Development
 npm run dev
+```
 
-# Production
+Production:
+
+```bash
 npm start
+```
+
+## Default Development URL
+
+If you use the current local setup, the backend runs at:
+
+```text
+http://localhost:5001
+```
+
+Base API URL:
+
+```text
+http://localhost:5001/api/v1
 ```
 
 ## API Documentation
 
-The API is fully documented using **Swagger/OpenAPI 3.0**. Once the server is running, you can access the interactive API documentation at:
+Swagger documentation is available at:
 
-🔗 **http://localhost:5000/api-docs**
-
-The documentation includes:
-- 📚 All 77+ API endpoints organized by modules
-- 🔐 Authentication requirements for each endpoint
-- 📝 Request/Response schemas with examples
-- ✅ Validation rules and error responses
-- 🧪 Interactive testing interface (Try it out!)
-
-### API Modules
-
-- **Authentication** - Register, login, profile management, password reset
-- **Users** - User management and administration
-- **Products** - Product CRUD, inventory management, variants, search
-- **Categories** - Hierarchical category management
-- **Suppliers** - Supplier management
-- **Customers** - Customer management and analytics
-- **Sales** - Sales orders, invoicing, payment tracking
-- **Purchases** - Purchase orders, receiving, supplier management
-- **Transactions** - Stock movements and history
-- **Reports** - Dashboard, analytics, trends
-- **Notifications** - Notification management and delivery
-- **Activity Logs** - Audit trail and system activity
-
-### Quick Start Examples
-
-```bash
-# Register a new user
-curl -X POST http://localhost:5000/api/v1/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{"name":"John Doe","email":"john@example.com","password":"password123"}'
-
-# Login
-curl -X POST http://localhost:5000/api/v1/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"john@example.com","password":"password123"}'
-
-# Get products (with authentication)
-curl -X GET http://localhost:5000/api/v1/products \
-  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+```text
+http://localhost:5001/api-docs
 ```
 
-For detailed documentation of all endpoints, please visit the Swagger UI at `/api-docs`.
+It can be used to inspect endpoints, request payloads, responses, and auth requirements.
 
-## Environment Variables
+## Example Use Cases
 
-See `.env.example` for all required environment variables.
+- authenticate admin or employee users
+- create and manage products and categories
+- track stock in and stock out movements
+- record purchases from suppliers
+- record sales and customer activity
+- generate dashboard data and reports
+- audit system activity through logs
 
-## Security Features
+## Environment Notes
 
-- Helmet.js for security headers
-- CORS configuration
-- Rate limiting
-- MongoDB sanitization
-- JWT authentication
-- bcrypt password hashing
-- Input validation
+Important environment values include:
 
-## License
+- `NODE_ENV`
+- `PORT`
+- `MONGODB_URI`
+- `JWT_SECRET`
+- `JWT_REFRESH_SECRET`
+- `CORS_ORIGIN`
+- `FRONTEND_URL`
 
-MIT
+See [`.env.example`](/Users/nirjal/ims/backend/.env.example) for the full list.
+
+## Scripts
+
+```bash
+npm run dev
+npm start
+npm test
+npm run lint
+npm run lint:fix
+```
+
+## Summary
+
+This backend provides the full API foundation for the BhandarX system. It is built with Node.js, Express, and MongoDB, and supports the complete inventory workflow from authentication to reporting.
