@@ -1,4 +1,5 @@
 const productRepository = require('./product.repository');
+const path = require('path');
 const AppError = require('../../shared/utils/AppError');
 const { HTTP_STATUS } = require('../../shared/constants');
 const PaginationHelper = require('../../shared/utils/PaginationHelper');
@@ -9,6 +10,20 @@ const {
 } = require('./product.dto');
 
 class ProductService {
+  normalizeImagePath(imagePath) {
+    if (!imagePath || typeof imagePath !== 'string') return imagePath;
+    if (imagePath.startsWith('http')) return imagePath;
+
+    const normalizedPath = imagePath.replace(/\\/g, '/');
+    const uploadsIndex = normalizedPath.indexOf('/uploads/');
+    if (uploadsIndex !== -1) {
+      return normalizedPath.slice(uploadsIndex);
+    }
+
+    const relativePath = path.basename(normalizedPath);
+    return `/uploads/products/${relativePath}`;
+  }
+
   async createProduct(productData, userId) {
     const createDTO = new CreateProductDTO(productData);
 
@@ -177,11 +192,12 @@ class ProductService {
 
   async updateProductImages(id, imageUrls, userId) {
     const existingProduct = await this.getProductById(id);
+    const normalizedImageUrls = imageUrls.map((imageUrl) => this.normalizeImagePath(imageUrl));
 
     // Merge new images with existing ones, or replace? 
     // Usually for POS, we might want to replace or append. 
     // Let's append but limit to 5 total images as per multer limit.
-    const allImages = [...(existingProduct.images || []), ...imageUrls].slice(-5);
+    const allImages = [...(existingProduct.images || []), ...normalizedImageUrls].slice(-5);
 
     const updatedProduct = await productRepository.update(id, {
       images: allImages,

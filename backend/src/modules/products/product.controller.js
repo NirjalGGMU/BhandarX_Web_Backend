@@ -1,6 +1,7 @@
 const productService = require('./product.service');
 const catchAsync = require('../../shared/utils/catchAsync');
 const ApiResponse = require('../../shared/utils/ApiResponse');
+const AppError = require('../../shared/utils/AppError');
 const { HTTP_STATUS } = require('../../shared/constants');
 
 class ProductController {

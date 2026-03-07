@@ -99,7 +99,6 @@ const supplierSchema = new mongoose.Schema(
 
 // Indexes
 supplierSchema.index({ name: 'text', email: 'text', code: 'text' });
-supplierSchema.index({ code: 1 });
 supplierSchema.index({ status: 1 });
 
 // Virtual for product count

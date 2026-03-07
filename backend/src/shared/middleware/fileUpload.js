@@ -3,6 +3,12 @@ const AppError = require('../utils/AppError');
 const fileUploadConfig = require('../../config/fileUpload');
 const { storage: cloudinaryStorage } = require('../../config/cloudinary');
 
+const hasCloudinaryCredentials = Boolean(
+  process.env.CLOUDINARY_CLOUD_NAME &&
+  process.env.CLOUDINARY_API_KEY &&
+  process.env.CLOUDINARY_API_SECRET
+);
+
 /**
  * Multer storage configuration for profile images
  */
@@ -19,7 +25,17 @@ const profileImageStorage = multer.diskStorage({
 /**
  * Multer storage configuration for product images - Now using Cloudinary
  */
-const productImageStorage = cloudinaryStorage;
+const productImageDiskStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, fileUploadConfig.productImagesDir);
+  },
+  filename: (req, file, cb) => {
+    const fileName = fileUploadConfig.generateFileName(file.originalname);
+    cb(null, fileName);
+  },
+});
+
+const productImageStorage = hasCloudinaryCredentials ? cloudinaryStorage : productImageDiskStorage;
 
 /**
  * Multer storage configuration for documents

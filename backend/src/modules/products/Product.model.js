@@ -114,7 +114,6 @@ productSchema.index({ name: 'text', description: 'text', sku: 'text' });
 productSchema.index({ category: 1, status: 1 });
 productSchema.index({ supplier: 1 });
 productSchema.index({ quantity: 1 });
-productSchema.index({ sku: 1 });
 
 // Virtual for price (mapped to sellingPrice for frontend consistency)
 productSchema.virtual('price').get(function () {

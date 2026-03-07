@@ -79,7 +79,6 @@ const customerSchema = new mongoose.Schema(
 
 // Indexes
 customerSchema.index({ name: 1 });
-customerSchema.index({ email: 1 });
 customerSchema.index({ phone: 1 });
 customerSchema.index({ customerType: 1 });
 customerSchema.index({ isActive: 1 });

@@ -95,8 +95,6 @@ const variantSchema = new mongoose.Schema(
 
 // Indexes
 variantSchema.index({ product: 1 });
-variantSchema.index({ sku: 1 });
-variantSchema.index({ barcode: 1 });
 variantSchema.index({ isActive: 1 });
 
 // Text index for search

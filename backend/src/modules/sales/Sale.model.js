@@ -139,7 +139,6 @@ const saleSchema = new mongoose.Schema(
 );
 
 // Indexes
-saleSchema.index({ invoiceNumber: 1 });
 saleSchema.index({ customer: 1, saleDate: -1 });
 saleSchema.index({ saleDate: -1 });
 saleSchema.index({ paymentStatus: 1 });

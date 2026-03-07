@@ -132,7 +132,6 @@ const purchaseOrderSchema = new mongoose.Schema(
 );
 
 // Indexes
-purchaseOrderSchema.index({ poNumber: 1 });
 purchaseOrderSchema.index({ supplier: 1, orderDate: -1 });
 purchaseOrderSchema.index({ orderDate: -1 });
 purchaseOrderSchema.index({ status: 1 });
